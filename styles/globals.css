@@ -1,26 +1,54 @@
-html,
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: 'Open Sans', 'Roboto', sans-serif;
 }
-
-a {
-  color: inherit;
-  text-decoration: none;
+.title {
+  font-family: 'Roboto Condensed', sans-serif;
 }
-
-* {
-  box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@layer base {
+  [type="text"],
+  [type="email"],
+  [type="url"],
+  [type="password"],
+  [type="number"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="search"],
+  [type="tel"],
+  [type="time"],
+  [type="week"],
+  [multiple],
+  textarea,
+  select {
+    @apply w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500;
   }
-  body {
-    color: white;
-    background: black;
+  [type="checkbox"],
+  [type="radio"] {
+    @apply border-gray-300 rounded text-blue-600 focus:ring-blue-500;
   }
+}
+
+.bg-site-blue {
+    background-color: #86aec0;
+    color: #000000;
+}
+
+.bg-site-orange {
+    background-color: #f6ac9f;
+}
+
+.color-site-blue {
+   color: #86aec0;
+}
+
+.color-site-orange {
+    color: #f2785c;
+}
+
+.home-page-article {
+  min-height: 400px;
 }
