@@ -2,13 +2,14 @@ import { SearchParams } from '../types';
 import { Context,createContext, useMemo, useReducer, useCallback } from 'react'
 import SearchReducer from './SearchReducer';
 import { Param } from '../types/Param';
-import { UPDATE_SEARCH_CRITERIA } from '../utils';
+import { INITIAL_STATE, UPDATE_SEARCH_CRITERIA } from '../utils';
+import { SearchContextData } from '../types/SerchContextData';
 type Props = {
   children: JSX.Element,
 };
-export const SearchContext: Context<SearchParams> = createContext({});
+export const SearchContext = createContext<SearchContextData>({state: INITIAL_STATE});
 function SearchContextProvider({children}: Props) {
-  const [state, dispatch] = useReducer(SearchReducer, {});
+  const [state, dispatch] = useReducer(SearchReducer, INITIAL_STATE);
 
   const update = useCallback(
     (data: Param) =>

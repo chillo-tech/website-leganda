@@ -7,7 +7,7 @@ function SearchReducer (state: SearchParams, action: Action){
     case UPDATE_SEARCH_CRITERIA: {
         return {
           ...state,
-          ...action.data
+          [action.data.key]: action.data.value
         }
     }
   }

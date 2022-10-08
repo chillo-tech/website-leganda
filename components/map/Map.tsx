@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect, FC} from 'react'
 import { GOOGLE_PACES_CENTER_COORDINATES, MAP_ZOOM } from '../../utils';
 interface MapProps extends google.maps.MapOptions {
+  children?: JSX.Element
   style?: { [key: string]: string };
   onClick?: (e: google.maps.MapMouseEvent) => void;
   onIdle?: (map: google.maps.Map) => void;
@@ -42,7 +43,7 @@ const Map: FC<MapProps> = ({
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           // set the map prop on the child component
-          return React.cloneElement(child, { map });
+          return map ? React.cloneElement(child, map) : null;
         }
       })}
     </>

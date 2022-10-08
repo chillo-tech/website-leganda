@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import React from 'react'
+import React,{useState} from 'react'
 import { getAddress} from '../../services'
 import Map from '../map/Map';
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
@@ -9,15 +9,17 @@ const render = (status: Status) => {
 };
 
 const Cities = () => {
-  const {data, error} = useQuery(['address'], getAddress )
+  const [cities, setCities] = useState<string[]>([]);
+  const {data, error} = useQuery(['address'], getAddress)
   const cityFromAddress = (address: string): string => {
       const parts = address.split(' ');
       let city = parts[parts.length - 2];
       return city.trim().replaceAll(',', '');
   }
 
-  const getCitiesFromAddress = () => {
-    return data.map(({street}:{street:string}) => cityFromAddress(street));
+  const getCitiesFromAddress = (data: any) => {
+    const mappedAddress = data.map(({street}:{street:string}) => cityFromAddress(street));
+    return mappedAddress;
   }
   return (
     <>
@@ -26,11 +28,13 @@ const Cities = () => {
       <div className="w-100 flex">
         <Wrapper apiKey='AIzaSyBoBBvzxlRlkbfYzZcHp8ALOwBk3YjfB-I' render={render}>
           <Map> 
+            <>
             {
-              data.map(({location}: any, key: string) => (
+              data.length ?  data.map(({location}: any, key: string) => (
                 <Marker position={{lat: location.coordinates[1], lng: location.coordinates[0]}} key={key} />
-              ))
+              )) : null
             }
+            </>
           </Map>
         </Wrapper>
       </div>
@@ -39,9 +43,7 @@ const Cities = () => {
           <span className='text-4xl font-semibold text-black'>Villes à proximité</span>
         </h2>
         <div className="cities grid grid-cols-2 gap-6 text-xl">
-          {[...new Set(getCitiesFromAddress(data))].map((city: string, key: string) => (
-              <p key={key}>{city}</p>
-            ))}
+          {getCitiesFromAddress(data).map((city: string, key: number) => <p key={key}>{city}</p>)}
         </div>
       </div>
     </section>) : null}

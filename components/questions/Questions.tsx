@@ -5,7 +5,7 @@ import { FaEnvelope, FaMobile, FaMobileAlt, FaPhoneAlt, FaWhatsapp } from 'react
 function Questions() {
   return (
     <section className='py-16'>
-        <div className="container grid md:grid-cols-2 justify-center items-center">
+        <div className="container grid md:grid-cols-2 md:gap-24">
           <article>
             <h2 className='text-4xl font-semibold text-black'>
               <p className='p-0 m-0'>Vous avez une question ?</p>
@@ -19,17 +19,17 @@ function Questions() {
           </article>
           <article>
               <Link href="tel:0033761705745">
-                <a className='py-3 text-lg flex items-center justify-center'>
+                <a className='py-3 text-lg flex'>
                   <FaMobileAlt className='text-3xl text-blue-500 mr-3' /> Poser ma question au téléphone
                 </a>
               </Link>
               <Link href="whatsapp:0033761705745">
-                <a className='py-3 text-lg flex items-center justify-center'>
+                <a className='py-3 text-lg flex'>
                   <FaWhatsapp className='text-3xl text-green-500 mr-3' /> Poser ma question sur whatsapp
                 </a>
               </Link>
               <Link href="mailto:armelle.leganda@gmail.com">
-                <a className='py-3 text-lg flex items-center justify-center'>
+                <a className='py-3 text-lg flex'>
                   <FaEnvelope className='text-3xl text-yellow-500 mr-3' /> Poser ma question par mail
                 </a>
               </Link>

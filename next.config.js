@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   swcMinify: true,
+  eslint: { ignoreDuringBuilds: true },
   env: {
     BACKOFFICE_URL: process.env.BACKOFFICE_URL,
     DNS: process.env.DNS,

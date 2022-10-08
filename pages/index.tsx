@@ -2,26 +2,26 @@ import type { NextPage } from 'next'
 import Head from 'next/head';
 import Image from 'next/image'
 import Link from 'next/link';
-import { useState,useRef,useEffect,useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLocationDot, faPhone, faUser} from '@fortawesome/free-solid-svg-icons'
+import { useState,useRef,useEffect,useCallback, useContext } from 'react';
 import Cities from '../components/cities/Cities';
 import Questions from '../components/questions/Questions';
+import { SearchContext } from '../context/search-context-provider';
+import { useRouter } from 'next/router';
+import Header from '../components/header/Header';
+import { cn, loaderProp } from '../utils';
 const Home: NextPage = () => {
-  let autoComplete;
+  let autoComplete: any;
+  const {update} = useContext(SearchContext);
+  const router = useRouter();
+
   const [query, setQuery] = useState("");
   const autoCompleteRef = useRef(null);
   const [isLoading, setLoading] = useState(true);
-  const loaderProp =({ src }: {src: string}) => {
-    return src;
-  }
-  const cn = (...classes: string[]) =>{
-    return classes.filter(Boolean).join(' ')
-  }
+
   const loadScript = (url: string, callback: any) => {
     let script = document.createElement("script");
     script.type = "text/javascript";
-  
+  /*
     if (script.readyState) {
       script.onreadystatechange = function() {
         if (script.readyState === "loaded" || script.readyState === "complete") {
@@ -32,23 +32,40 @@ const Home: NextPage = () => {
     } else {
       script.onload = () => callback();
     }
-  
+  */
     script.src = url;
     document.getElementsByTagName("head")[0].appendChild(script);
   };  
 
   const handleScriptLoad =  useCallback((updateQuery: any, autoCompleteRef: any) => {
-    autoComplete = new window.google.maps.places.Autocomplete(autoCompleteRef.current, { types: ["(cities)"]});
+    autoComplete = new google.maps.places.Autocomplete(autoCompleteRef.current, { types: ["(cities)"]});
     autoComplete.setFields(["address_components", "formatted_address", "geometry.location"]);
     autoComplete.addListener("place_changed", () => handlePlaceSelect(updateQuery));
   },[]);
 
   const handlePlaceSelect = (data: any) => {
-    const addressObject = autoComplete.getPlace(); // get place from google api
+    
+    const addressObject = autoComplete.getPlace(); 
+    const city = addressObject.address_components[0].short_name;
     const query = addressObject.formatted_address;
     const lat = addressObject.geometry.location.lat();
     const lng = addressObject.geometry.location.lng();
+    const address = {
+      street: query,
+      city,
+      location: {
+        type: 'city',
+        coordinates: [lat, lng]
+      }
+    }
     setQuery(query);
+    if(update) {
+      update({key: 'address', value: address});
+    }
+    router.push('search');
+  }
+  const goToSearch = () => {
+    router.push('search');
   }
   useEffect(() => {
     handleScriptLoad(setQuery, autoCompleteRef)
@@ -77,30 +94,8 @@ const Home: NextPage = () => {
               onLoadingComplete={() => setLoading(false)}
             />
             <div className="bg-gray opacity-100 header-content absolute bottom-0 top-0 left-0 right-0">
-              <div className="bg-black-rgba w-full px-10 h-screen mx-auto flex flex-col justify-between">
-                <nav className='py-10 flex justify-between items-center'>
-                  <Link href="/">
-                    <a className='text-orange-600 uppercase title text-5xl'>LEGANDA</a>
-                  </Link>
-                  <ul className='md:flex justify-between items-center hidden'>
-                    <li>
-                      <Link href="/">
-                        <a className='border border-orange-600 rounded-3xl px-5 py-2 text-orange-600 flex justify-between items-center'>
-                          <FontAwesomeIcon icon={faUser} className="border-none text-xs mr-2" size='xs' />
-                          Nouveau compte
-                        </a>
-                      </Link>
-                    </li>
-                    <li  className='ml-2'>
-                    <Link href="/">
-                      <a className='bg-orange-600 rounded-3xl text-xl px-5 font-medium py-2 flex text-white'>
-                        <FontAwesomeIcon icon={faPhone} className="border-none mr-2"/>
-                        Contact
-                      </a>
-                    </Link>
-                    </li>
-                  </ul>
-                </nav>
+              <div className="bg-black-rgba w-full pt-5 px-10 h-screen mx-auto flex flex-col justify-between">
+                <Header withSearchBar={false} />
                 <div className="form">
                   <h1 className='py-6 text-5xl font-semibold text-white'>Vos plats préférés, près de vous</h1>
                     <div className="flex flex-col md:flex-row items-center">
@@ -108,14 +103,16 @@ const Home: NextPage = () => {
                         <input 
                           autoComplete='off'
                           type="text" 
-                          placeholder='Sasissez votre adresse' 
+                          placeholder='Sasissez votre ville' 
                           className='text-2xl rounded-none shadow-md border-none border-transparent focus:border-transparent focus:ring-0'
                           ref={autoCompleteRef}
                           onChange={event => setQuery(event.target.value)}
                           value={query}
                         />
                       </div>
-                      <button className='basis-full block w-full md:basis-1/6 bg-orange-600 text-white py-3 md:px-2 shadow-md text-xl'>
+                      <button type='button'
+                        onClick={goToSearch}
+                        className='basis-full block w-full md:basis-1/6 bg-orange-600 text-white py-3 md:px-2 shadow-md text-xl'>
                         Rechercher
                       </button>
                     </div>
@@ -213,7 +210,7 @@ const Home: NextPage = () => {
               </div>
             </div>
           </section>
-          <Cities />
+          {/*<Cities />*/}
           <Questions />
         </main>
       </>

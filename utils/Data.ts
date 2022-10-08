@@ -1,5 +1,5 @@
 import {EMAIL, PHONE} from "./providers";
-
+export const CATEGORY_BGCOLORS = [ "#BCA1F2", "#BCDDE4", "#CFEACB", "#F4E169"];
 export const PLUS_FAVORITES_UPDATED = "Super cette annonce a été ajoutée à vos favoris";
 export const REMOVE_FAVORITES_UPDATED = "Cette annonce a été retirée de vos favoris";
 export const AUTHENTICATED_USER = "authenticatedUser";
@@ -25,26 +25,7 @@ export const RESTORE_TOKEN = "RESTORE_TOKEN";
 export const AD_PLACEHOLDER = ["Taro du dimanche", "20kg à destination de Yaoundé", "Carton de Guinness", "Stage de developpeur"];
 
 export const INITIAL_STATE = {
-
-	creationWizard: {
-		stepIndex: 0,
-		numberOfChildren: 0,
-		ad: {
-			pictures: []
-		}
-	},
-	searchCriteria: {
-		pushResults: false,
-		page: 0,
-		size: 6,
-		query: '',
-		location: {
-			coordinates: []
-		}
-	},
-	cats: [],
-	ads: []
-
+		address: {city: ''}
 }
 
 export const HELP_LINK = {
@@ -124,3 +105,10 @@ export const MORESCREEN_DATA = [
 		]
 	}
 ]
+
+export const loaderProp =({ src }: {src: string}) => {
+  return src;
+}
+export const cn = (...classes: string[]) =>{
+  return classes.filter(Boolean).join(' ')
+}
