@@ -16,7 +16,7 @@ function SearchBar() {
       const result = results[0];
     
       if (result) {
-        const {components: {village}, formatted} = result;
+        const {components: {village = ''}, formatted} = result;
         setSelectedCity(village.replaceAll('-', ' '));
         const address = {
           street: formatted,
@@ -34,7 +34,6 @@ function SearchBar() {
     [update],
   );
   
-  const fetchAds = 
   useEffect(() => {
     if(address && address.city) {
       const {city} = address;

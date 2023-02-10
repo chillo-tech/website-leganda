@@ -2,148 +2,93 @@ import type { NextPage } from 'next'
 import Head from 'next/head';
 import Image from 'next/image'
 import Link from 'next/link';
-import { useState,useRef,useEffect,useCallback, useContext } from 'react';
-import Cities from '../components/cities/Cities';
+import { useState,useRef,useEffect } from 'react';
 import Questions from '../components/questions/Questions';
-import { SearchContext } from '../context/search-context-provider';
-import { useRouter } from 'next/router';
 import Header from '../components/header/Header';
-import { cn, loaderProp } from '../utils';
+import {HEADERS_ITEMS, STORES} from '../utils';
+import Tabs from '../components/tabs';
+import { HOW_IT_WORKS } from '../utils/how-it-works';
+import { RiCloseCircleLine } from 'react-icons/ri';
+
 const Home: NextPage = () => {
-  let autoComplete: any;
-  const {update} = useContext(SearchContext);
-  const router = useRouter();
+  const timeoutRef = useRef<any>();
+  const [displayedItemIndex, setDisplayedItemIndex] = useState(0);
+  const [displayedMobileMenu, setDisplayedMobileMenu] = useState(false);
+  const delay = 5000;
 
-  const [query, setQuery] = useState("");
-  const autoCompleteRef = useRef(null);
-  const [isLoading, setLoading] = useState(true);
-
-  const loadScript = (url: string, callback: any) => {
-    let script = document.createElement("script");
-    script.type = "text/javascript";
-  /*
-    if (script.readyState) {
-      script.onreadystatechange = function() {
-        if (script.readyState === "loaded" || script.readyState === "complete") {
-          script.onreadystatechange = null;
-          callback();
-        }
-      };
-    } else {
-      script.onload = () => callback();
+  const resetTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-  */
-    script.src = url;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  };  
-
-  const handleScriptLoad =  useCallback((updateQuery: any, autoCompleteRef: any) => {
-    autoComplete = new google.maps.places.Autocomplete(autoCompleteRef.current, { types: ["(cities)"]});
-    autoComplete.setFields(["address_components", "formatted_address", "geometry.location"]);
-    autoComplete.addListener("place_changed", () => handlePlaceSelect(updateQuery));
-  },[]);
-
-  const handlePlaceSelect = (data: any) => {
-    
-    const addressObject = autoComplete.getPlace(); 
-    const city = addressObject.address_components[0].short_name;
-    const query = addressObject.formatted_address;
-    const lat = addressObject.geometry.location.lat();
-    const lng = addressObject.geometry.location.lng();
-    const address = {
-      street: query,
-      city,
-      location: {
-        type: 'city',
-        coordinates: [lat, lng]
-      }
-    }
-    setQuery(query);
-    if(update) {
-      update({key: 'address', value: address});
-    }
-    router.push('search');
   }
-  const goToSearch = () => {
-    router.push('search');
+  const toggleMenu = () => {
+    setDisplayedMobileMenu(current => !current);
   }
   useEffect(() => {
-    handleScriptLoad(setQuery, autoCompleteRef)
-  }, [handleScriptLoad]);
+    timeoutRef.current = setTimeout(
+      () =>
+          setDisplayedItemIndex((prevIndex) =>
+              prevIndex === HEADERS_ITEMS.length - 1 ? 0 : prevIndex + 1
+          ),
+      delay
+    );
+    return () => {
+      resetTimeout();
+    };
+  }, [displayedItemIndex]);
   return (
-      <>
+      <section className='relative'>
         <Head>
-          <title>LEGANDA | Repas entre particuliers</title>
+          <title>{`LEGANDA | Repas entre particuliers ${HEADERS_ITEMS[displayedItemIndex]['label']}`}</title>
         </Head>
         <main>
-          <header className="relative h-screen">
+          <header className="relative h-screen md:mb-0">
             <Image
-              src="/images/food.jpeg"
-              alt="Vendez vos plats près de vous"
-              layout="fill"
+              src={HEADERS_ITEMS[displayedItemIndex]['image']}
+              alt={`Leganda ${HEADERS_ITEMS[displayedItemIndex]['label']}`}
               unoptimized={true} 
               priority={true}
-              objectFit="cover"
-              loader={loaderProp}
-              className={cn(
-                'duration-700 ease-in-out group-hover:opacity-75 hidden',
-                isLoading
-                  ? 'scale-110 blur-2xl grayscale'
-                  : 'scale-100 blur-0 grayscale-0'
-              )}
-              onLoadingComplete={() => setLoading(false)}
+              fill={true}
+              className="object-cover"     
             />
-            <div className="bg-gray opacity-100 header-content absolute bottom-0 top-0 left-0 right-0">
-              <div className="bg-black-rgba w-full pt-5 px-10 h-screen mx-auto flex flex-col justify-between">
-                <Header withSearchBar={false} />
-                <div className="form">
-                  <h1 className='py-6 text-5xl font-semibold text-white'>Vos plats préférés, près de vous</h1>
-                    <div className="flex flex-col md:flex-row items-center">
-                      <div className="form-group basis-full md:basis-1/2 border-2 border-orange-600 flex items-center bg-white">
-                        <input 
-                          autoComplete='off'
-                          type="text" 
-                          placeholder='Sasissez votre ville' 
-                          className='text-2xl rounded-none shadow-md border-none border-transparent focus:border-transparent focus:ring-0'
-                          ref={autoCompleteRef}
-                          onChange={event => setQuery(event.target.value)}
-                          value={query}
-                        />
-                      </div>
-                      <button type='button'
-                        onClick={goToSearch}
-                        className='basis-full block w-full md:basis-1/6 bg-orange-600 text-white py-3 md:px-2 shadow-md text-xl'>
-                        Rechercher
-                      </button>
-                    </div>
+            <div className="bg-gray opacity-200 header-content absolute bottom-0 top-0 left-0 right-0">
+              <div className="bg-black-rgba w-full pt-5 px-3 md:px-10 h-screen mx-auto flex flex-col justify-between">
+                <Header withSearchBar={false} toggleMenu={toggleMenu}/>
+                <div className="container">
+                  <div className="text-5xl md:text-8xl font-extrabold text-white">Retrouvez</div>
+                  <div className="text-5xl md:text-8xl py-4 font-extrabold text-white py-2 md:py-4 text-orange-600">{HEADERS_ITEMS[displayedItemIndex]['label']}</div>
+                  <div className="text-5xl md:text-8xl font-extrabold text-white">Près de vous</div>
+                  <p className="flex py-4 items-center justify-start">
+                    {STORES.filter((item: any) => item.active).map((item: any, index: number) => (
+                        <Link
+                            href="#"
+                            target="_blank"
+                            key={`liens-${index}`} className="block items-center py-2 w-48 h-14 relative">
+                          <Image
+                              fill={true}
+                              src={`/images/${item.image}`}
+                              alt={item?.label}
+                          />
+                         
+                        </Link>
+                    ))}
+                  </p>
                 </div>
-                <p className='text-white py-4 text-xl font-extralight'>
-                
-                </p>
+                <p />
               </div>
             </div>
           </header>
-          <section className="categories">
-            <div className="w-full px-10 py-12">
-              <div className="wrapper">
+          <section className="categories py-3 md:py-16 bg-app-light-blue">
+            <div className="container">
               <div className="grid gap-10 md:grid-cols-3">
-                <Link href='/'>
-                  <a className='relative'>
+                <Link href='/' className='relative'>
                     <div className="relative home-page-article ">
                       <Image
                           src="/images/eat-food.jpeg"
                           alt="os plats préférés tout près de chez vous"
-                          layout="fill"
-                          objectFit="cover"
+                          fill={true}
                           unoptimized={true} 
-                          loader={loaderProp}
-                          className={cn(
-                            'duration-700 ease-in-out group-hover:opacity-75 hidden',
-                            isLoading
-                              ? 'scale-110 blur-2xl grayscale'
-                              : 'scale-100 blur-0 grayscale-0'
-                          )}
-                          onLoadingComplete={() => setLoading(false)}
+                          className="object-cover"
                         />
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 top-0 bg-black-rgba">
@@ -151,25 +96,16 @@ const Home: NextPage = () => {
                     <div className="absolute bottom-0 left-0 right-0 py-5 px-5 text-white">
                       <h2 className='font-bold pt-2 text-3xl md:text-4xl title shadow-2xl'>Vos plats préférés <br /> tout près de chez vous</h2>
                     </div>
-                  </a>
                 </Link>
-                <Link href='/'>
-                  <a className='relative'>
+                <Link href='/' className='relative'>
                     <div className="relative home-page-article ">
                       <Image
                           src="/images/food-on-fire.jpeg"
                           alt="Vendez vos plats de vous"
-                          layout="fill"
-                          objectFit="cover"
+
+                          fill={true}
                           unoptimized={true} 
-                          loader={loaderProp}
-                          className={cn(
-                            'duration-700 ease-in-out group-hover:opacity-75 hidden',
-                            isLoading
-                              ? 'scale-110 blur-2xl grayscale'
-                              : 'scale-100 blur-0 grayscale-0'
-                          )}
-                          onLoadingComplete={() => setLoading(false)}
+                          className="object-cover"
                         />
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 top-0 bg-black-rgba">
@@ -177,25 +113,15 @@ const Home: NextPage = () => {
                     <div className="absolute bottom-0 left-0 right-0 py-5 px-5 text-white">
                       <h2 className='font-bold pt-2 text-3xl md:text-4xl title shadow-2xl'>Vendez des plats <br /> au tour de vous</h2>
                     </div>
-                  </a>
                 </Link>
-                <Link href='/'>
-                  <a className='relative'>
+                <Link href='/' className='relative'>
                     <div className="relative home-page-article ">
                       <Image
                           src="/images/delivery.jpeg"
                           alt="Livrez des repas avec leganda"                          
-                          layout="fill"
-                          objectFit="cover"
+                          fill={true}
                           unoptimized={true} 
-                          loader={loaderProp}
-                          className={cn(
-                            'duration-700 ease-in-out group-hover:opacity-75 hidden',
-                            isLoading
-                              ? 'scale-110 blur-2xl grayscale'
-                              : 'scale-100 blur-0 grayscale-0'
-                          )}
-                          onLoadingComplete={() => setLoading(false)}
+                          className="object-cover"
                         />
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 top-0 bg-black-rgba">
@@ -203,17 +129,46 @@ const Home: NextPage = () => {
                     <div className="absolute bottom-0 left-0 right-0 py-5 px-5 text-white">
                       <h2 className='font-bold pt-2 text-3xl md:text-4xl title shadow-2xl'>Livrez <br /> avec LEGANDA</h2>
                     </div>
-                  </a>
                 </Link>
              
               </div>
               </div>
-            </div>
+          </section>
+          <section className=''>
+          <Tabs items={HOW_IT_WORKS}/>
           </section>
           {/*<Cities />*/}
           <Questions />
         </main>
-      </>
+        {
+          displayedMobileMenu ? (
+              <section className='menu z-50 fixed left-0 top-0 bottom-0 right-0 bg-white px-2 py-5 flex flex-col justify-between'>
+              <header>
+              <nav className='flex justify-between items-center'>
+                <Link href="/" className='text-orange-600 uppercase title text-5xl'>LEGANDA
+                </Link>
+                <button type='button' onClick={toggleMenu}>
+                  <RiCloseCircleLine className="text-white text-5xl font-extralight text-orange-600"/>
+                </button>
+                </nav>
+              </header>
+              <ul className='md:flex flex-column items-center'>
+              <li>
+                <Link href="https://chillo.tech/nos-postes" target="_blank" className='font-extrabold uppercase text-2xl text-gray-700 block text-center py-4'>
+                  Rejoignez nous
+                </Link>
+              </li>
+              <li>
+                <Link href="#contact" onClick={toggleMenu} className='font-extrabold uppercase text-2xl text-gray-700 block text-center py-4'>
+                  Contactez nous
+                </Link>
+              </li>
+            </ul>
+              <p/>
+              </section>
+          ) : null
+        }
+      </section>
   )
 }
 

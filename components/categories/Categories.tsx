@@ -8,9 +8,9 @@ function Categories() {
   const {data = [], error} = useQuery(['address'], getCategory);
   const [isLoading, setLoading] = useState(true);
   return (
-    <section className={`grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 md:h-36 my-5`}>
+    <section className={`container mx-auto grid pb-8 mb-8 grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 md:h-32 my-5 md:border-b md:border-gray-200`}>
       { data.length ? (data.map((category: any, key: number) => (
-         <button type='button' className='p-4 rounded-md grid grid-cols-3 md:gap-2 justify-between items-center' style={{ backgroundColor: CATEGORY_BGCOLORS[key]}} key={category.id}>
+         <button type='button' className='p-4 rounded-md grid grid-cols-4 md:gap-2 justify-between items-center' style={{ backgroundColor: CATEGORY_BGCOLORS[key]}} key={category.id}>
           <div className='relative h-full'>
             <Image
                 src={`${IMAGES_URL}/${category.icon}`}
@@ -29,7 +29,7 @@ function Categories() {
                 onLoadingComplete={() => setLoading(false)}
               />
           </div>
-          <h2 className='title text-xl md:text-3xl col-span-2'>{category.name}{data.length }</h2>
+          <h2 className='title text-xl md:text-xl col-span-3'>{category.name}</h2>
 
       </button>
       ))): null}
