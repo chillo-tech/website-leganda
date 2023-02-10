@@ -3,7 +3,7 @@ import React from 'react'
 import { TbMenu } from 'react-icons/tb'
 import SearchBar from './items/SearchBar'
 
-function Header({withSearchBar = true, toggleMenu}: {toggleMenu: any, withSearchBar?: boolean}) {
+function Header({withSearchBar = true, toggleMenu}: {toggleMenu?: any, withSearchBar?: boolean}) {
   return (
     <header className="container py-4">
        <nav className='flex justify-between items-center'>
@@ -22,7 +22,7 @@ function Header({withSearchBar = true, toggleMenu}: {toggleMenu: any, withSearch
             </Link>
           </li>
         </ul>
-        <button type='button' onClick={toggleMenu}>
+        <button type='button' onClick={toggleMenu} className="md:hidden">
           <TbMenu className="text-white text-5xl font-extralight"/>
         </button>
       </nav>
